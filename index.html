@@ -513,33 +513,6 @@ renderPlans('all');
 </script>
 
 
-<!-- ==========================================================================
-     CHAT WIDGET MOUNT POINT
-     --------------------------------------------------------------------------
-     The page above is deliberately chat-free. Drop the chat bubble in here.
-
-     1. VENDOR SNIPPET
-        Most web-chat products (Cisco ECE / Webex Connect, Genesys, LivePerson,
-        Zendesk, Intercom, Twilio Flex) ship a single <script> tag that injects
-        its own launcher button and iframe. Paste it between the markers below.
-        Nothing on this page styles or positions it — the widget owns that.
-
-     2. SELF-HOSTED WIDGET
-        If the bubble is your own build, mount it into #chat-widget-root.
-        The div is empty, unstyled and has no layout impact until you use it;
-        position it fixed from your own CSS.
-
-     3. RESERVED SPACE
-        Nothing on this page sits in the bottom-right corner, so a standard
-        launcher at right:20px / bottom:20px will not collide. The only fixed
-        element is #toast (bottom-centre, z-index 200) which auto-hides.
-        Give the launcher z-index 150 or above to clear the sticky header (50).
-
-     4. PRE-CHAT CONTEXT (optional)
-        window.CHAT_CONTEXT below is populated from the page so the widget can
-        pass routing hints — page section, selected plan filter, locale — into
-        the pre-chat form or the contact attributes. Delete if not needed.
-     ========================================================================== -->
 
 <div id="chat-widget-root"></div>
 
