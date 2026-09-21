@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Households Site POC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+:root{
+  --ground:#F2F6F4; --surface:#FFFFFF; --surface-2:#E9F0ED; --sunk:#DCE6E2;
+  --ink:#0D262D; --ink-2:#3C5A61; --ink-3:#6B858B;
+  --line:#D5E0DC; --line-strong:#B9CAC5;
+  --accent:#0C7A5E; --accent-deep:#075744; --accent-soft:#DFF0E9;
+  --brand-deep:#075744; --on-brand:#EAF6F1; --on-accent:#FFFFFF;
+  --amber:#B5661B; --amber-soft:#FBEBDC;
+  --demo:#8A4A05; --demo-bg:#FDF0DC; --demo-line:#E8C79A;
+  --shadow:0 1px 2px rgba(13,38,45,.06),0 8px 24px -12px rgba(13,38,45,.18);
+  --shadow-lift:0 2px 6px rgba(13,38,45,.08),0 24px 48px -20px rgba(13,38,45,.30);
+  --r:10px;
+  --display:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0A1416; --surface:#111F22; --surface-2:#182C30; --sunk:#0D1B1E;
+    --ink:#E6EFEC; --ink-2:#A7BDB9; --ink-3:#7A9490;
+    --line:#22383C; --line-strong:#33504F;
+    --accent:#2FB68C; --accent-deep:#57D3AC; --accent-soft:#12312A;
+    --brand-deep:#0E2B26; --on-brand:#D9EFE7; --on-accent:#05221B;
+    --amber:#E5A261; --amber-soft:#2E2013;
+    --demo:#F0C089; --demo-bg:#2A1D0C; --demo-line:#5A4218;
+    --shadow:0 1px 2px rgba(0,0,0,.5),0 8px 24px -12px rgba(0,0,0,.7);
+    --shadow-lift:0 2px 6px rgba(0,0,0,.5),0 24px 48px -20px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0A1416; --surface:#111F22; --surface-2:#182C30; --sunk:#0D1B1E;
+  --ink:#E6EFEC; --ink-2:#A7BDB9; --ink-3:#7A9490;
+  --line:#22383C; --line-strong:#33504F;
+  --accent:#2FB68C; --accent-deep:#57D3AC; --accent-soft:#12312A;
+  --brand-deep:#0E2B26; --on-brand:#D9EFE7; --on-accent:#05221B;
+  --amber:#E5A261; --amber-soft:#2E2013;
+  --demo:#F0C089; --demo-bg:#2A1D0C; --demo-line:#5A4218;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 8px 24px -12px rgba(0,0,0,.7);
+  --shadow-lift:0 2px 6px rgba(0,0,0,.5),0 24px 48px -20px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--ground); color:var(--ink);
+  font-family:var(--body); font-size:16px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%}
+[hidden]{display:none!important}
+h1,h2,h3,h4{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.018em;line-height:1.14}
+p{margin:0}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+.wrap{max-width:1160px;margin-inline:auto;padding-inline:20px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+
+/* ---------- demo ribbon ---------- */
+.ribbon{
+  background:var(--demo-bg);border-bottom:1px solid var(--demo-line);color:var(--demo);
+  font-size:12.5px;line-height:1.45;position:relative;z-index:60;
+}
+.ribbon .wrap{display:flex;gap:12px;align-items:flex-start;padding-block:9px}
+.ribbon b{font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.1em;
+  border:1px solid currentColor;border-radius:3px;padding:2px 6px;flex:none;margin-top:1px}
+
+/* ---------- header ---------- */
+.topbar{background:var(--brand-deep);color:var(--on-brand);font-size:12.5px}
+.topbar .wrap{display:flex;gap:18px;justify-content:flex-end;align-items:center;padding-block:7px;flex-wrap:wrap}
+.topbar a{text-decoration:none;opacity:.85}
+.topbar a:hover{opacity:1;text-decoration:underline}
+
+header.site{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--surface);
+  border-bottom:1px solid var(--line)}
+header.site .wrap{display:flex;align-items:center;gap:26px;padding-block:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;text-decoration:none}
+.brand .mark{width:30px;height:30px;flex:none}
+.brand .txt{display:flex;flex-direction:column;line-height:1}
+.brand .txt strong{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-.02em}
+.brand .txt span{font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;color:var(--ink-3);margin-top:3px}
+nav.main{display:flex;gap:4px;margin-left:auto;align-items:center;flex-wrap:wrap}
+nav.main a{font-size:14.5px;font-weight:600;text-decoration:none;padding:8px 11px;border-radius:7px;color:var(--ink-2)}
+nav.main a:hover{background:var(--surface-2);color:var(--ink)}
+nav.main a[aria-current]{color:var(--accent)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:8px;
+  font-family:var(--display);font-weight:600;font-size:14.5px;padding:10px 18px;text-decoration:none;
+  transition:background .15s,border-color .15s,transform .1s}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--accent);color:var(--on-accent)}
+.btn-primary:hover{background:var(--accent-deep)}
+.btn-ghost{border:1px solid var(--line-strong);color:var(--ink)}
+.btn-ghost:hover{background:var(--surface-2)}
+.btn-sm{padding:7px 13px;font-size:13.5px}
+
+/* ---------- hero ---------- */
+.hero{background:var(--surface);border-bottom:1px solid var(--line)}
+.hero .wrap{display:grid;grid-template-columns:1.15fr .85fr;gap:44px;align-items:center;padding-block:52px}
+.slide{display:none}
+.slide.on{display:block;animation:fade .45s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.hero h1{font-size:clamp(30px,4.4vw,46px);font-weight:700;margin-bottom:14px}
+.hero p.lede{font-size:17.5px;color:var(--ink-2);max-width:46ch;margin-bottom:22px}
+.hero .cta{display:flex;gap:10px;flex-wrap:wrap}
+.dots{display:flex;gap:7px;margin-top:26px}
+.dots button{width:26px;height:4px;border-radius:2px;background:var(--line-strong)}
+.dots button[aria-selected="true"]{background:var(--accent);width:40px}
+
+.tariff{background:var(--sunk);border:1px solid var(--line);border-radius:14px;padding:22px}
+.tariff h3{font-size:14px;font-weight:600;color:var(--ink-2);margin-bottom:16px}
+.tariff .row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+  padding-block:11px;border-bottom:1px dashed var(--line-strong)}
+.tariff .row:last-of-type{border-bottom:0}
+.tariff .row span{font-size:14px;color:var(--ink-2)}
+.tariff .row b{font-family:var(--mono);font-weight:500;font-size:19px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.tariff .row.hi b{color:var(--accent)}
+.tariff .note{font-size:11.5px;color:var(--ink-3);margin-top:14px;line-height:1.45}
+
+/* ---------- usp ---------- */
+.usp{background:var(--accent-soft);border-bottom:1px solid var(--line)}
+.usp .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;padding-block:22px}
+.usp div{display:flex;gap:11px;align-items:flex-start}
+.usp svg{flex:none;margin-top:2px;color:var(--accent)}
+.usp strong{display:block;font-family:var(--display);font-size:14.5px;font-weight:600}
+.usp small{color:var(--ink-2);font-size:13px}
+
+/* ---------- sections ---------- */
+section{padding-block:54px}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;
+  flex-wrap:wrap;margin-bottom:26px}
+.sec-head h2{font-size:clamp(23px,3vw,31px);font-weight:700}
+.sec-head p{color:var(--ink-2);font-size:15.5px;max-width:58ch;margin-top:7px}
+
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px;
+  background:var(--surface-2);padding:5px;border-radius:10px;width:fit-content}
+.tabs button{padding:8px 15px;border-radius:7px;font-size:14px;font-weight:600;color:var(--ink-2)}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:16px}
+.plan{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  padding:20px;display:flex;flex-direction:column;gap:13px;position:relative}
+.plan.feat{border-color:var(--accent);box-shadow:var(--shadow)}
+.plan .tag{position:absolute;top:-9px;left:18px;background:var(--accent);color:var(--on-accent);
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;padding:3px 8px;border-radius:3px;text-transform:uppercase}
+.plan .code{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase}
+.plan h3{font-size:19px;font-weight:600}
+.plan .rate{display:flex;align-items:baseline;gap:5px;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.plan .rate b{font-size:31px;font-weight:500;letter-spacing:-.03em}
+.plan .rate small{font-size:12.5px;color:var(--ink-3)}
+.plan ul{margin:0;padding-left:0;list-style:none;display:flex;flex-direction:column;gap:7px;
+  font-size:14px;color:var(--ink-2);flex:1}
+.plan ul li{display:flex;gap:8px}
+.plan ul li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);
+  flex:none;margin-top:8px}
+.plan .foot{display:flex;gap:9px;align-items:center;padding-top:3px}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:26px}
+.panel h3{font-size:20px;font-weight:600;margin-bottom:9px}
+.panel p{color:var(--ink-2);font-size:14.5px;margin-bottom:16px}
+
+.band{background:var(--brand-deep);color:var(--on-brand)}
+.band .wrap{display:grid;grid-template-columns:1fr auto;gap:28px;align-items:center;padding-block:36px}
+.band h2{font-size:25px;font-weight:700;margin-bottom:8px}
+.band p{font-size:15px;opacity:.82;max-width:62ch}
+.band .btn-ghost{border-color:rgba(255,255,255,.35);color:var(--on-brand)}
+.band .btn-ghost:hover{background:rgba(255,255,255,.1)}
+
+/* ---------- footer ---------- */
+footer{background:var(--surface);border-top:1px solid var(--line);padding-block:44px 0;font-size:14px}
+.fcols{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:34px}
+.fcols h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:13px}
+.fcols ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+.fcols a{color:var(--ink-2);text-decoration:none}
+.fcols a:hover{color:var(--accent);text-decoration:underline}
+.news{display:flex;gap:8px;margin-top:14px;max-width:330px}
+.news input{flex:1;min-width:0;padding:9px 12px;border:1px solid var(--line-strong);border-radius:8px;
+  background:var(--ground);color:var(--ink);font:inherit;font-size:14px}
+.legal{border-top:1px solid var(--line);margin-top:36px;padding-block:20px;
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:var(--ink-3);font-size:12.5px}
+
+/* ---------- toast ---------- */
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:var(--ground);padding:11px 18px;border-radius:9px;font-size:14px;
+  box-shadow:var(--shadow-lift);opacity:0;pointer-events:none;transition:.25s;z-index:200;max-width:min(92vw,420px)}
+#toast.on{opacity:1;transform:translateX(-50%)}
+:root[data-theme="dark"] #toast{background:var(--surface-2);color:var(--ink);border:1px solid var(--line)}
+
+/* ---------- responsive ---------- */
+@media (max-width:900px){
+  .hero .wrap{grid-template-columns:1fr;gap:30px;padding-block:38px}
+  .usp .wrap{grid-template-columns:1fr;gap:16px}
+  .split{grid-template-columns:1fr}
+  .band .wrap{grid-template-columns:1fr}
+  .fcols{grid-template-columns:1fr 1fr;gap:26px}
+  nav.main{display:none}
+}
+@media (max-width:640px){
+  .topbar{display:none}
+  header.site .wrap{gap:12px}
+  header.site .btn-ghost{display:none}
+  .brand .txt strong{font-size:15.5px}
+  .ribbon{font-size:12px}
+}
+@media (max-width:560px){
+  .fcols{grid-template-columns:1fr}
+  section{padding-block:38px}
+}
+</style>
+</head>
+<body>
+
+<div class="ribbon">
+  <div class="wrap">
+    <b>DEMO</b>
+    <p>Visnet Global proof-of-concept build. <strong>Not affiliated with, endorsed by, or operated by Senoko Energy Pte Ltd.</strong> Every rate and offer below is fictional sample data. No live accounts, logins or payments exist on this page.</p>
+  </div>
+</div>
+
+<div class="topbar">
+  <div class="wrap">
+    <a href="#" data-stub>Residential</a>
+    <a href="#" data-stub>Business</a>
+    <a href="#" data-stub>Find a plan</a>
+    <a href="#" data-stub>Manage My Account</a>
+  </div>
+</div>
+
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="#" data-stub>
+      <svg class="mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect width="32" height="32" rx="8" fill="currentColor" style="color:var(--accent)"/>
+        <path d="M17.4 6.5 10 17.6h4.9L13.8 25.5 22 13.9h-5.2l.6-7.4Z" fill="var(--surface)"/>
+      </svg>
+      <span class="txt"><strong>Senoko Energy</strong><span>DEMO ENVIRONMENT</span></span>
+    </a>
+    <nav class="main">
+      <a href="#plans" aria-current="page">For Households</a>
+      <a href="#" data-stub>For Businesses</a>
+      <a href="#" data-stub>About Us</a>
+      <a href="#" data-stub>#TakeCharge</a>
+      <a href="#" data-stub>Support</a>
+    </nav>
+    <button class="btn btn-ghost btn-sm" data-stub>Log in</button>
+    <a class="btn btn-primary btn-sm" href="#plans">Compare plans</a>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <div>
+      <div class="slide on" data-slide="0">
+        <p class="eyebrow">Switch offer · ends 31 Oct 2026</p>
+        <h1>No surprises. Just a rate that holds.</h1>
+        <p class="lede">Lock your electricity rate for 12, 24 or 36 months and stop watching the quarterly tariff. No security deposit, no hidden fees, U-Save rebates still apply.</p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#plans">See fixed rates</a>
+          <button class="btn btn-ghost" data-stub>How switching works</button>
+        </div>
+      </div>
+      <div class="slide" data-slide="1">
+        <p class="eyebrow">New homeowners</p>
+        <h1>Keys today, power on tomorrow.</h1>
+        <p class="lede">Register your BTO or resale completion date and we'll schedule your account activation for move-in day — with a preferential first-year rate for new homeowners.</p>
+        <div class="cta">
+          <button class="btn btn-primary" data-stub>Register my move-in</button>
+          <a class="btn btn-ghost" href="#homeowners">How it works</a>
+        </div>
+      </div>
+      <div class="slide" data-slide="2">
+        <p class="eyebrow">#TakeCharge</p>
+        <h1>Renewable, and you can prove it.</h1>
+        <p class="lede">Every Green 24 household is matched with Renewable Energy Certificates you can trace by account ID — retired in your name, listed in your monthly statement.</p>
+        <div class="cta">
+          <a class="btn btn-primary" href="#recs">View sample RECs</a>
+          <a class="btn btn-ghost" href="#plans">See green plans</a>
+        </div>
+      </div>
+      <div class="dots" role="tablist" aria-label="Promotions">
+        <button role="tab" aria-selected="true" aria-label="Fixed rate offer"></button>
+        <button role="tab" aria-selected="false" aria-label="New homeowners"></button>
+        <button role="tab" aria-selected="false" aria-label="Green energy"></button>
+      </div>
+    </div>
+
+    <div class="tariff">
+      <h3>Your estimate · 4-room HDB</h3>
+      <div class="row"><span>Regulated tariff (Q4 2026)</span><b>32.14¢</b></div>
+      <div class="row hi"><span>Fixed 24 plan rate</span><b>29.80¢</b></div>
+      <div class="row"><span>Average monthly usage</span><b>365 kWh</b></div>
+      <div class="row"><span>Estimated monthly saving</span><b>S$8.54</b></div>
+      <p class="note">Illustrative sample figures for demonstration only. Rates shown exclude GST and are not an offer. A real deployment would read live tariff data from the retailer's pricing service.</p>
+    </div>
+  </div>
+</div>
+
+<div class="usp">
+  <div class="wrap">
+    <div>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <div><strong>No security deposit</strong><small>No hidden fees, no admin charge on sign-up.</small></div>
+    </div>
+    <div>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12V8H6a2 2 0 0 1 0-4h12v4"/><path d="M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+      <div><strong>U-Save rebates apply</strong><small>Government rebates offset your bill as usual.</small></div>
+    </div>
+    <div>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.6 5.6 6.1.8-4.5 4.2 1.2 6L12 16.8 6.6 19.6l1.2-6L3.3 9.4l6.1-.8Z"/></svg>
+      <div><strong>Smart Rewards</strong><small>Partner privileges and bill rebates each quarter.</small></div>
+    </div>
+  </div>
+</div>
+
+<section id="plans">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <p class="eyebrow">Price plans</p>
+        <h2>Pick the shape of your bill</h2>
+        <p>Four plan families for households on the Open Electricity Market. All prices below are fictional demo data shown before GST.</p>
+      </div>
+      <button class="btn btn-ghost btn-sm" data-stub>Talk to our team</button>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Plan type">
+      <button role="tab" aria-selected="true" data-filter="all">All plans</button>
+      <button role="tab" aria-selected="false" data-filter="fixed">Fixed rate</button>
+      <button role="tab" aria-selected="false" data-filter="discount">Tariff discount</button>
+      <button role="tab" aria-selected="false" data-filter="peak">Off-peak</button>
+      <button role="tab" aria-selected="false" data-filter="green">Green</button>
+    </div>
+
+    <div class="plans" id="planGrid"></div>
+  </div>
+</section>
+
+<section id="homeowners" style="padding-top:0">
+  <div class="wrap">
+    <div class="split">
+      <div class="panel">
+        <p class="eyebrow">New homeowners</p>
+        <h3>Collecting keys soon?</h3>
+        <p>Tell us your completion or key-collection date and we'll line up activation so the lights are on the day you walk in. New homeowners unlock a preferential first-year rate and a double Smart Rewards quarter.</p>
+        <button class="btn btn-primary" data-stub>Register interest</button>
+      </div>
+      <div class="panel">
+        <p class="eyebrow">Corporate partners</p>
+        <h3>Check your employer's rate</h3>
+        <p>More than 600 Singapore employers hold a corporate account with us, and staff household rates come with it. Ask your HR team for the partner code, or let our team look it up from your work email domain.</p>
+        <button class="btn btn-ghost" data-stub>Look up my company</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="band" id="recs">
+  <div class="wrap">
+    <div>
+      <h2>Renewable Energy Certificates, traceable to your account</h2>
+      <p>Green 24 households are matched 1:1 with RECs retired against their consumption. Enter your account ID to see the certificate serials, generation source and retirement date for any billing period.</p>
+    </div>
+    <button class="btn btn-ghost" data-stub>View your RECs</button>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="fcols">
+      <div>
+        <a class="brand" href="#" data-stub style="margin-bottom:14px">
+          <svg class="mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <rect width="32" height="32" rx="8" fill="currentColor" style="color:var(--accent)"/>
+            <path d="M17.4 6.5 10 17.6h4.9L13.8 25.5 22 13.9h-5.2l.6-7.4Z" fill="var(--surface)"/>
+          </svg>
+          <span class="txt"><strong>Senoko Energy</strong><span>DEMO ENVIRONMENT</span></span>
+        </a>
+        <h4>Newsletter</h4>
+        <p style="color:var(--ink-2);font-size:13.5px">Energy news and deals, straight to your inbox.</p>
+        <form class="news" id="newsForm">
+          <input type="email" id="newsEmail" placeholder="you@example.com" aria-label="Email address" required>
+          <button class="btn btn-primary btn-sm" type="submit">Sign up</button>
+        </form>
+      </div>
+      <div>
+        <h4>For Households</h4>
+        <ul>
+          <li><a href="#plans">Price Plans</a></li>
+          <li><a href="#" data-stub>Promotions</a></li>
+          <li><a href="#" data-stub>Smart Rewards</a></li>
+          <li><a href="#" data-stub>EcoSmart Homes</a></li>
+          <li><a href="#" data-stub>Blog</a></li>
+          <li><a href="#" data-stub>Support</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>For Businesses</h4>
+        <ul>
+          <li><a href="#" data-stub>Price Plans</a></li>
+          <li><a href="#" data-stub>Smart Solutions</a></li>
+          <li><a href="#" data-stub>Sustainable Solutions</a></li>
+          <li><a href="#" data-stub>Partners</a></li>
+          <li><a href="#" data-stub>Support</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>About</h4>
+        <ul>
+          <li><a href="#" data-stub>Our Company</a></li>
+          <li><a href="#" data-stub>Join Us</a></li>
+          <li><a href="#" data-stub>Media Centre</a></li>
+          <li><a href="#" data-stub>Cyber Security</a></li>
+          <li><a href="#" data-stub>Privacy Policy</a></li>
+          <li><a href="#" data-stub>Terms of Use</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="legal">
+      <span>Mock interface built by Visnet Global for demonstration. Not a Senoko Energy property.</span>
+      <span>Sample data only · No real accounts, transactions or personal data</span>
+    </div>
+  </div>
+</footer>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------------- toast + stubbed links ---------------- */
+var toastEl=document.getElementById('toast'), toastT;
+function toast(m){toastEl.textContent=m;toastEl.classList.add('on');
+  clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('on')},2600);}
+
+document.addEventListener('click',function(e){
+  var s=e.target.closest('[data-stub]');
+  if(s){e.preventDefault();toast('Demo build — this link is not wired up in the POC.');}
+});
+
+document.getElementById('newsForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  document.getElementById('newsEmail').value='';
+  toast('Demo build — no email was sent or stored.');
+});
+
+/* ---------------- hero carousel ---------------- */
+var slides=[].slice.call(document.querySelectorAll('.slide')),
+    dots=[].slice.call(document.querySelectorAll('.dots button')),
+    cur=0, auto;
+function go(i){
+  cur=(i+slides.length)%slides.length;
+  slides.forEach(function(s,n){s.classList.toggle('on',n===cur)});
+  dots.forEach(function(d,n){d.setAttribute('aria-selected',n===cur?'true':'false')});
+}
+dots.forEach(function(d,n){d.addEventListener('click',function(){go(n);restart();})});
+function restart(){clearInterval(auto);auto=setInterval(function(){go(cur+1)},7000);}
+if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches) restart();
+
+/* ---------------- price plans ---------------- */
+var PLANS=[
+ {code:'FIX-36',name:'Fixed 36',type:'fixed',rate:'29.40',unit:'¢/kWh',feat:false,
+  bullets:['Rate held for 36 months','No security deposit','Smart Rewards included']},
+ {code:'FIX-24',name:'Fixed 24',type:'fixed',rate:'29.80',unit:'¢/kWh',feat:true,tag:'Most chosen',
+  bullets:['Rate held for 24 months','Best balance of price and term','RECs matched 50%']},
+ {code:'FIX-12',name:'Fixed 12',type:'fixed',rate:'31.00',unit:'¢/kWh',feat:false,
+  bullets:['Shortest fixed commitment','Ideal for rental tenancies','Renew or switch after 12 months']},
+ {code:'DSC-24',name:'Tariff Discount 24',type:'discount',rate:'1.64',unit:'¢ off tariff',feat:false,
+  bullets:['Always below the regulated tariff','Moves with quarterly tariff','24-month term']},
+ {code:'PEAK-24',name:'Off-Peak Saver 24',type:'peak',rate:'20.05',unit:'¢/kWh off-peak',feat:false,
+  bullets:['20.05¢ from 11pm to 7am','33.10¢ peak rate','Best for EV charging']},
+ {code:'GRN-24',name:'Green 24',type:'green',rate:'30.18',unit:'¢/kWh',feat:false,
+  bullets:['100% renewable via RECs','Certificates traceable by account','24-month term']}
+];
+var grid=document.getElementById('planGrid');
+function renderPlans(f){
+  grid.innerHTML='';
+  PLANS.filter(function(p){return f==='all'||p.type===f}).forEach(function(p){
+    var el=document.createElement('div');
+    el.className='plan'+(p.feat?' feat':'');
+    el.innerHTML=(p.tag?'<span class="tag">'+p.tag+'</span>':'')+
+      '<span class="code">'+p.code+'</span>'+
+      '<h3>'+p.name+'</h3>'+
+      '<div class="rate"><b>'+p.rate+'</b><small>'+p.unit+'</small></div>'+
+      '<ul>'+p.bullets.map(function(b){return '<li>'+b+'</li>'}).join('')+'</ul>'+
+      '<div class="foot"><button class="btn btn-primary btn-sm" data-stub>Secure now</button>'+
+      '<button class="btn btn-ghost btn-sm" data-stub>Details</button></div>';
+    grid.appendChild(el);
+  });
+}
+renderPlans('all');
+[].slice.call(document.querySelectorAll('.tabs button')).forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.tabs button').forEach(function(x){x.setAttribute('aria-selected','false')});
+    b.setAttribute('aria-selected','true');
+    renderPlans(b.dataset.filter);
+  });
+});
+
+})();
+</script>
+
+
+<!-- ==========================================================================
+     CHAT WIDGET MOUNT POINT
+     --------------------------------------------------------------------------
+     The page above is deliberately chat-free. Drop the chat bubble in here.
+
+     1. VENDOR SNIPPET
+        Most web-chat products (Cisco ECE / Webex Connect, Genesys, LivePerson,
+        Zendesk, Intercom, Twilio Flex) ship a single <script> tag that injects
+        its own launcher button and iframe. Paste it between the markers below.
+        Nothing on this page styles or positions it — the widget owns that.
+
+     2. SELF-HOSTED WIDGET
+        If the bubble is your own build, mount it into #chat-widget-root.
+        The div is empty, unstyled and has no layout impact until you use it;
+        position it fixed from your own CSS.
+
+     3. RESERVED SPACE
+        Nothing on this page sits in the bottom-right corner, so a standard
+        launcher at right:20px / bottom:20px will not collide. The only fixed
+        element is #toast (bottom-centre, z-index 200) which auto-hides.
+        Give the launcher z-index 150 or above to clear the sticky header (50).
+
+     4. PRE-CHAT CONTEXT (optional)
+        window.CHAT_CONTEXT below is populated from the page so the widget can
+        pass routing hints — page section, selected plan filter, locale — into
+        the pre-chat form or the contact attributes. Delete if not needed.
+     ========================================================================== -->
+
+<div id="chat-widget-root"></div>
+
+<script>
+  window.CHAT_CONTEXT = {
+    site:      'households',
+    page:      'price-plans',
+    locale:    'en-SG',
+    segment:   'residential',
+    planFilter: function(){
+      var t = document.querySelector('.tabs button[aria-selected="true"]');
+      return t ? t.dataset.filter : 'all';
+    }
+  };
+</script>
+
+<!-- ===== BEGIN CHAT WIDGET SNIPPET ===== -->
+
+<!-- Paste the vendor <script> tag here. Example shape:
+
+<script src="https://your-chat-host.example.com/widget/loader.js"
+        data-deployment-id="REPLACE_ME"
+        data-locale="en-SG"
+        async></script>
+-->
+
+<!-- ===== END CHAT WIDGET SNIPPET ===== -->
+
+</body>
+</html>
